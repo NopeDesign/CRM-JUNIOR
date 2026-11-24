@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validador MEI & PME (CNPJ) - CRM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/global.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="min-h-screen antialiased flex flex-col">
+
+  <!-- Topbar -->
+  <header class="cnpj-header backdrop-blur sticky top-0 z-20">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg cnpj-icone-topo flex items-center justify-center text-sm">
+          <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-semibold text-sm sm:text-base tracking-tight text-[#e6ebf2]">Validador MEI & PME</h1>
+          <span id="statusConsultaCnpj" class="text-xs text-[#9aa5b8]">Pronto</span>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-1.5">
+        <a href="../painel-clientes/" class="nav-modulo-link">
+          <i class="fa-solid fa-table-columns"></i>
+          <span>Painel</span>
+        </a>
+        <a href="../agenda-retornos/" class="nav-modulo-link">
+          <i class="fa-solid fa-clock"></i>
+          <span>Follow-up</span>
+        </a>
+        <a href="../consulta-cnpj/" class="nav-modulo-link ativo">
+          <i class="fa-solid fa-building-shield"></i>
+          <span>CNPJ</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-5 space-y-5 flex-1">
+
+    <!-- Campo de Busca por CNPJ -->
+    <section class="cnpj-card p-4 sm:p-5">
+      <form id="formConsultaCnpj" onsubmit="consultarCnpjSubmit(event)" class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[#687387] text-xs"></i>
+          <input
+            type="text"
+            id="inputCnpj"
+            oninput="aoDigitarCnpj(this)"
+            placeholder="Digite ou cole o CNPJ (ex: 00.000.000/0001-00)..."
+            maxlength="18"
+            class="input-crm pl-9"
+            autocomplete="off"
+          />
+        </div>
+        <button type="submit" id="btnConsultarCnpj" class="btn-primario font-semibold px-4 py-2 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer shrink-0">
+          <i class="fa-solid fa-bolt text-xs"></i>
+          <span>Consultar CNPJ</span>
+        </button>
+      </form>
+      <p class="text-[11px] text-[#687387] mt-2">
+        Consulta automática ao completar 14 dígitos • Verifica situação cadastral, carência de 6 meses para MEI e quadro societário.
+      </p>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <!-- Resultado da Consulta -->
+      <section class="lg:col-span-8 cnpj-card p-4 sm:p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-[#232a3b]">
+          <h2 class="text-sm font-semibold text-[#e6ebf2]">Diagnóstico da Empresa</h2>
+          <span id="badgeEnquadramento" class="text-xs text-[#9aa5b8]">Aguardando consulta</span>
+        </div>
+
+        <!-- Banner de Validação (6 meses MEI / Situação) -->
+        <div id="bannerValidacao" class="hidden rounded-xl p-3.5 text-xs sm:text-sm flex items-start gap-3"></div>
+
+        <!-- Estado Inicial / Vazio -->
+        <div id="estadoInicialCnpj" class="py-12 text-center text-sm text-[#687387]">
+          Digite um CNPJ acima para conferir a situação cadastral, tempo de abertura e sócios.
+        </div>
+
+        <!-- Dados Principais -->
+        <div id="resultadoDetalhes" class="hidden space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="cnpj-box-dado">
+              <span class="text-[11px] text-[#9aa5b8] block">Razão Social</span>
+              <strong id="resRazaoSocial" class="text-sm text-[#e6ebf2] mt-0.5 block">—</strong>
+            </div>
+
+            <div class="cnpj-box-dado">
+              <span class="text-[11px] text-[#9aa5b8] block">Nome Fantasia</span>
+              <strong id="resNomeFantasia" class="text-sm text-[#e6ebf2] mt-0.5 block">—</strong>
+            </div>
+
+            <div class="cnpj-box-dado">
+              <span class="text-[11px] text-[#9aa5b8] block">Situação Cadastral</span>
+              <strong id="resSituacao" class="text-sm text-[#e6ebf2] mt-0.5 block">—</strong>
+            </div>
+
+            <div class="cnpj-box-dado">
+              <span class="text-[11px] text-[#9aa5b8] block">Data de Abertura / Tempo</span>
+              <strong id="resAbertura" class="text-sm text-[#e6ebf2] mt-0.5 block">—</strong>
+            </div>
+          </div>
+
+          <div class="cnpj-box-dado">
+            <span class="text-[11px] text-[#9aa5b8] block">Atividade Principal (CNAE)</span>
+            <p id="resCnae" class="text-xs sm:text-sm text-[#cbd5e1] mt-0.5">—</p>
+          </div>
+
+          <!-- Quadro Societário -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-[#9aa5b8]">
+                Quadro Societário (QSA)
+              </h3>
+              <span id="resQtdSocios" class="text-xs text-[#687387]">0 sócios</span>
+            </div>
+            <div id="listaSocios" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+          </div>
+
+          <!-- Ação Rápida para Copiar Resumo -->
+          <div class="pt-3 border-t border-[#232a3b] flex flex-wrap items-center justify-between gap-2">
+            <span id="resCnpjFormatado" class="text-xs text-[#9aa5b8]"></span>
+            <button type="button" onclick="copiarResumoCnpj()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#171c28] hover:bg-[#1c2231] text-[#e6ebf2] border border-[#232a3b] cursor-pointer transition">
+              <i class="fa-regular fa-copy mr-1.5 text-emerald-400"></i>
+              Copiar resumo para WhatsApp
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Histórico Recente de Consultas -->
+      <aside class="lg:col-span-4 cnpj-card p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between pb-2.5 border-b border-[#232a3b]">
+          <h2 class="text-sm font-semibold text-[#e6ebf2]">Consultas Recentes</h2>
+          <button type="button" onclick="limparHistoricoCnpj()" class="text-[11px] text-[#687387] hover:text-rose-400 cursor-pointer transition">
+            Limpar
+          </button>
+        </div>
+
+        <div id="listaHistoricoCnpj" class="space-y-2 max-h-[460px] overflow-y-auto custom-scroll"></div>
+        <div id="vazioHistoricoCnpj" class="py-8 text-center text-xs text-[#687387]">
+          Nenhuma consulta realizada ainda.
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <script src="../shared/config.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

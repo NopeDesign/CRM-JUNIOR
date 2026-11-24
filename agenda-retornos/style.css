@@ -1,0 +1,150 @@
+.agenda-header {
+  background-color: rgba(18, 22, 31, 0.9);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.agenda-icone-topo {
+  background-color: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--accent-primary);
+}
+
+.nav-modulo-link {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.nav-modulo-link:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+  border-color: var(--border-subtle);
+}
+
+.nav-modulo-link.ativo {
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+  border-color: var(--border-strong);
+  font-weight: 600;
+}
+
+.resumo-card {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.filtro-chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filtro-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.filtro-chip.ativo {
+  background-color: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+  font-weight: 600;
+}
+
+.fila-item {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.fila-item:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-strong);
+}
+
+.tag-alerta-24h {
+  background-color: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  color: #fcd34d;
+}
+
+.tag-retorno-hoje {
+  background-color: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  color: #7dd3fc;
+}
+
+.tag-fila-agora {
+  background-color: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  color: #6ee7b7;
+}
+
+.atalho-data-btn {
+  padding: 0.4rem 0.55rem;
+  border-radius: 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.atalho-data-btn:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+  background-color: rgba(16, 185, 129, 0.08);
+}
+
+.modal-caixa {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+}
+
+.toast-aviso {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 60;
+  background-color: var(--bg-card);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  padding: 0.7rem 0.95rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.toast-aviso.visivel {
+  opacity: 1;
+  transform: translateY(0);
+}

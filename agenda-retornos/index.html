@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda & Retornos do Dia - CRM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/global.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="min-h-screen antialiased flex flex-col">
+
+  <!-- Topbar -->
+  <header class="agenda-header backdrop-blur sticky top-0 z-20">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg agenda-icone-topo flex items-center justify-center text-sm">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <h1 class="font-semibold text-sm sm:text-base tracking-tight text-[#e6ebf2]">Agenda de Retornos</h1>
+          <span id="modoConexao" class="text-xs text-[#9aa5b8]">Conectando...</span>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-1.5">
+        <a href="../painel-clientes/" class="nav-modulo-link">
+          <i class="fa-solid fa-table-columns"></i>
+          <span>Painel</span>
+        </a>
+        <a href="../agenda-retornos/" class="nav-modulo-link ativo">
+          <i class="fa-solid fa-clock"></i>
+          <span>Follow-up</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-5 space-y-5 flex-1">
+
+    <!-- Cards de Resumo -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div class="resumo-card flex items-center justify-between">
+        <div>
+          <p class="text-xs text-[#9aa5b8]">Fila para tentar agora</p>
+          <p id="countFilaAgora" class="text-xl font-semibold text-[#e6ebf2] mt-0.5">0</p>
+        </div>
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+          <i class="fa-brands fa-whatsapp"></i>
+        </div>
+      </div>
+
+      <div class="resumo-card flex items-center justify-between">
+        <div>
+          <p class="text-xs text-[#9aa5b8]">Retorno agendado (hoje / atrasado)</p>
+          <p id="countRetornoData" class="text-xl font-semibold text-[#e6ebf2] mt-0.5">0</p>
+        </div>
+        <div class="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/25 flex items-center justify-center text-sky-400">
+          <i class="fa-regular fa-calendar"></i>
+        </div>
+      </div>
+
+      <div class="resumo-card flex items-center justify-between">
+        <div>
+          <p class="text-xs text-[#9aa5b8]">Parados há mais de 24h</p>
+          <p id="countParados24h" class="text-xl font-semibold text-[#e6ebf2] mt-0.5">0</p>
+        </div>
+        <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- Busca e Filtros -->
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="relative flex-1 max-w-md">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[#687387] text-xs"></i>
+        <input
+          type="text"
+          id="campoBuscaAgenda"
+          oninput="renderizarFila()"
+          placeholder="Filtrar por nome, WhatsApp ou etapa..."
+          class="input-crm pl-9"
+        />
+      </div>
+
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <button type="button" data-filtro="todos" onclick="setFiltroAgenda('todos')" class="filtro-chip ativo">
+          Fila única
+        </button>
+        <button type="button" data-filtro="agora" onclick="setFiltroAgenda('agora')" class="filtro-chip">
+          Tentar agora
+        </button>
+        <button type="button" data-filtro="retorno" onclick="setFiltroAgenda('retorno')" class="filtro-chip">
+          Data específica
+        </button>
+        <button type="button" data-filtro="24h" onclick="setFiltroAgenda('24h')" class="filtro-chip">
+          +24h parado
+        </button>
+      </div>
+    </section>
+
+    <!-- Fila Única do Dia -->
+    <section class="bg-[#12161f] border border-[#232a3b] rounded-xl p-4">
+      <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-[#232a3b]">
+        <div class="flex items-center gap-2">
+          <h2 class="text-sm font-semibold text-[#e6ebf2]">Fila de Prioridade do Dia</h2>
+          <span id="contadorVisivel" class="text-xs text-[#9aa5b8]">0 itens</span>
+        </div>
+        <span class="text-xs text-[#687387]">Janela de disparo: 10h às 18h</span>
+      </div>
+
+      <div id="listaFilaDia" class="space-y-2.5 custom-scroll"></div>
+
+      <div id="vazioFilaDia" class="hidden py-12 text-center text-sm text-[#687387]">
+        Nenhuma tarefa pendente neste filtro para hoje.
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast de Feedback -->
+  <div id="toastFeedback" class="toast-aviso" role="status" aria-live="polite">
+    <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+    <span id="toastTexto">Salvo</span>
+  </div>
+
+  <!-- Modal Agendar Retorno -->
+  <div id="modalRetorno" class="fixed inset-0 bg-black/75 backdrop-blur-[2px] hidden items-center justify-center p-4 z-50">
+    <div class="modal-caixa rounded-xl w-full max-w-sm p-5 shadow-2xl">
+      <div class="flex items-center justify-between mb-4 pb-2.5 border-b border-[#232a3b]">
+        <div>
+          <h3 id="retornoNomeCliente" class="text-sm font-semibold text-[#e6ebf2]">Agendar Retorno</h3>
+          <p class="text-xs text-[#9aa5b8]">Escolha um atalho rápido ou uma data específica</p>
+        </div>
+        <button onclick="fecharModalRetorno()" class="text-[#9aa5b8] hover:text-[#e6ebf2] cursor-pointer p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formRetorno" onsubmit="salvarDataRetorno(event)" class="space-y-4">
+        <input type="hidden" id="retornoClienteId" />
+
+        <div>
+          <label class="block text-xs font-medium text-[#9aa5b8] mb-1.5">Atalhos rápidos</label>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button type="button" onclick="aplicarAtalhoData('amanha')" class="atalho-data-btn">
+              Amanhã
+            </button>
+            <button type="button" onclick="aplicarAtalhoData('2dias')" class="atalho-data-btn">
+              Em 2 dias
+            </button>
+            <button type="button" onclick="aplicarAtalhoData('3dias')" class="atalho-data-btn">
+              +3 dias
+            </button>
+            <button type="button" onclick="aplicarAtalhoData('segunda')" class="atalho-data-btn">
+              Próxima segunda
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-[#9aa5b8] mb-1.5">Data do retorno</label>
+          <input type="date" id="retornoDataInput" class="input-crm" />
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-[#232a3b]">
+          <button type="button" onclick="limparDataRetorno()" class="text-xs text-rose-400 hover:text-rose-300 cursor-pointer">
+            Remover data
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="fecharModalRetorno()" class="px-3 py-1.5 rounded-lg text-xs text-[#9aa5b8] hover:text-[#e6ebf2] cursor-pointer">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primario font-semibold px-3.5 py-1.5 rounded-lg text-xs cursor-pointer">
+              Salvar data
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Disparar Zap com Prévia -->
+  <div id="modalZap" class="fixed inset-0 bg-black/75 backdrop-blur-[2px] hidden items-center justify-center p-4 z-50">
+    <div class="modal-caixa rounded-xl w-full max-w-md p-5 shadow-2xl">
+      <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-[#232a3b]">
+        <div>
+          <h3 id="zapTitulo" class="font-semibold text-sm text-[#e6ebf2]">Enviar mensagem no WhatsApp</h3>
+          <p id="zapSubtitulo" class="text-xs text-[#9aa5b8] mt-0.5"></p>
+        </div>
+        <button onclick="fecharModalZap()" class="text-[#9aa5b8] hover:text-[#e6ebf2] cursor-pointer p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <textarea id="zapTexto" rows="6" class="input-crm resize-none custom-scroll leading-relaxed"></textarea>
+
+      <div class="mt-4 flex items-center justify-between gap-2">
+        <button type="button" id="btnSoMarcarZap"
+          class="px-3 py-2 rounded-lg text-xs font-medium bg-[#171c28] hover:bg-[#1c2231] text-[#e6ebf2] border border-[#232a3b] cursor-pointer transition">
+          Apenas registrar tentativa
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="fecharModalZap()" class="px-3 py-2 rounded-lg text-xs text-[#9aa5b8] hover:text-[#e6ebf2] cursor-pointer">
+            Fechar
+          </button>
+          <button type="button" id="btnAbrirZapAgora"
+            class="btn-primario font-semibold px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            Abrir WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared/config.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+:root {
+  --bg-app: #0c0f14;
+  --bg-panel: #12161f;
+  --bg-card: #171c28;
+  --bg-card-hover: #1c2231;
+  --bg-input: #0e121a;
+  --border-subtle: #232a3b;
+  --border-strong: #313b52;
+  --accent-primary: #10b981;
+  --accent-primary-hover: #34d399;
+  --accent-info: #38bdf8;
+  --text-primary: #e6ebf2;
+  --text-secondary: #9aa5b8;
+  --text-muted: #687387;
+}
+
+::selection {
+  background-color: rgba(16, 185, 129, 0.28);
+  color: #ecfdf5;
+}
+
+html,
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #252d3f;
+  border-radius: 9999px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #36415a;
+}
+
+.btn-primario {
+  background-color: var(--accent-primary);
+  color: #062118;
+  transition: background-color 0.15s ease;
+}
+
+.btn-primario:hover {
+  background-color: var(--accent-primary-hover);
+}
+
+.input-crm {
+  width: 100%;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-crm::placeholder {
+  color: var(--text-muted);
+}
+
+.input-crm:focus {
+  outline: none;
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.12);
+}

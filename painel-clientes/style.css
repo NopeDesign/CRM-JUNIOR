@@ -1,0 +1,100 @@
+.painel-header {
+  background-color: rgba(18, 22, 31, 0.9);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.painel-icone-topo {
+  background-color: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--accent-primary);
+}
+
+.seletor-view {
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-view {
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-view:hover {
+  color: var(--text-primary);
+}
+
+.btn-view.active {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+}
+
+.badge-epoca {
+  background-color: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  color: #93c5fd;
+}
+
+.painel-surface {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+}
+
+.kanban-coluna {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+}
+
+.kanban-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.kanban-card:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-strong);
+}
+
+.coluna-drop-ativa {
+  border-color: rgba(16, 185, 129, 0.7) !important;
+  background-color: rgba(16, 185, 129, 0.04) !important;
+}
+
+.tentativa-btn {
+  border-radius: 0.375rem;
+  font-size: 0.65rem;
+  font-weight: 500;
+  transition: all 0.12s ease;
+  cursor: pointer;
+}
+
+.tentativa-pendente {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.tentativa-pendente:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background-color: var(--bg-card-hover);
+}
+
+.tentativa-feita {
+  background-color: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+}
+
+.modal-caixa {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+}
